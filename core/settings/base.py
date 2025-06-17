@@ -136,7 +136,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
+RESET_PASSWORD_LINK = env.str("RESET_PASSWORD_LINK")
 
 from core.packages.rest_framework import *
 from core.packages.swagger import *

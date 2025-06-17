@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.tokens import default_token_generator
 
 from rest_framework import generics, status, permissions, parsers
 from rest_framework.response import Response
@@ -62,3 +63,47 @@ class CompleteUserProfileApiView(generics.GenericAPIView):
             return Response({"message": "Profile complited"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+
+class EnterUserPasswordApiView(generics.GenericAPIView):
+    serializer_class = serializers.EnterUserPasswordSerializer
+    queryset = models.User.objects.all()
+
+    def put(self, request, id):
+        user = get_object_or_404(models.User, id=id)
+        serializer = self.serializer_class(user, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(
+                {"id": user.id, "message": "User password successfully updated!"},
+                status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class ForgotPasswordApiView(generics.GenericAPIView):
+    serializer_class = serializers.ForgotPassword
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            user = models.User.objects.get(email=serializer.validated_data.get('email'))
+            token = default_token_generator.make_token(user)
+            transaction.on_commit(lambda: tasks.send_reset_link.delay(token, user.email, user.id))
+            return Response({'message': 'Reset link has been send!'}, status=status.HTTP_200_OK)
+        except models.User.DoesNotExist:
+            return Response({"message": "user not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+    
+class ResetPasswordApiView(generics.GenericAPIView):
+    serializer_class = serializers.ResetPasswordSerializer
+
+    def post(self, request, user_id, token):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = get_object_or_404(models.User, id=user_id)
+        if default_token_generator.check_token(user, token):
+            user.set_password(serializer.validated_data.get('new_password'))
+            user.save()
+            return Response({"message": "Successfully updated user password!"}, status=status.HTTP_200_OK)
+        return Response({'message': 'user id or token invalid!'}, status=status.HTTP_404_NOT_FOUND)

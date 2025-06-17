@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.utils import timezone
+from django.contrib.auth.hashers import make_password
 
 from rest_framework import serializers
 
@@ -115,3 +116,36 @@ class CompleteUserProfileSerializer(serializers.ModelSerializer):
             instance.region = validated_data.get('region')
             instance.save()
             return instance
+        
+    
+class EnterUserPasswordSerializer(serializers.Serializer):
+    password = serializers.CharField()
+    confirm_password = serializers.CharField()
+
+    def validate(self, data):
+        if data.get('password') != data.get('confirm_password'):
+            raise serializers.ValidationError("Two password must be same!")
+        if len(data.get('password')) < 6:
+            raise serializers.ValidationError("Password min length is 6!")
+        if data.get('password').isdigit():
+            raise serializers.ValidationError("Password is to numeric!")
+        return data
+    
+    def update(self, instance, validated_data):
+        instance.password = make_password(validated_data.get('password'))
+        instance.save()
+        return instance
+    
+
+class ForgotPassword(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(min_length=6)
+    confirm_password = serializers.CharField(min_length=6)
+
+    def validate(self, data):
+        if data.get('new_password') != data.get('confirm_password'):
+            raise serializers.ValidationError("Password do not match!")
+        return data
