@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from apps.shared.models import BaseModel, Region, City
 from apps.accounts.managers import CustomUserManager
+from apps.skills.models import Category, Skill
 
 FREELANCER, COMPANY, ADMIN = ('freelancer', 'company', 'admin')
 
@@ -26,7 +27,8 @@ class User(AbstractUser, BaseModel):
     
     is_verified = models.BooleanField(default=False)
 
-    # skills = models.ManyToManyField()
+    category = models.ForeignKey(Category, on_delete=models.DO_NOTHING, null=True)
+    skills = models.ManyToManyField(Skill, related_name="users")
     city = models.ForeignKey(
         City, on_delete=models.DO_NOTHING, related_name='cities', null=True, blank=True
     )

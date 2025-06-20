@@ -1,11 +1,13 @@
 from django.db import transaction
 from django.utils import timezone
 from django.contrib.auth.hashers import make_password
+from django.shortcuts import get_list_or_404
 
 from rest_framework import serializers
 
 from apps.accounts import models 
 from apps.shared.models import City, Region
+from apps.skills.models import Category, Skill
 
 
 class RegisterByEmailSerializer(serializers.Serializer):
@@ -149,3 +151,25 @@ class ResetPasswordSerializer(serializers.Serializer):
         if data.get('new_password') != data.get('confirm_password'):
             raise serializers.ValidationError("Password do not match!")
         return data
+    
+
+class SkillsAndCategoryChooseSerializer(serializers.Serializer):
+    skills_ids = serializers.ListSerializer(child=serializers.UUIDField())
+    category = serializers.UUIDField()
+
+    def validate(self, data):
+        try:
+            category = Category.objects.get(id=data.get('category'))
+        except Category.DoesNotExist:
+            raise serializers.ValidationError("category not found!")
+        skills = get_list_or_404(Skill, id__in=data.pop('skills_ids', []))
+        data['skills'] = skills
+        data['category'] = category
+        return data
+    
+    def update(self, instance, validated_data):
+        with transaction.atomic():
+            instance.category = validated_data.get('category')
+            instance.skills.set(validated_data.pop('skills', []))
+            instance.save()
+            return instance

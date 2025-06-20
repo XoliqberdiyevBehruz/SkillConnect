@@ -11,6 +11,7 @@ urlpatterns = [
     path('register/regenerate_code/', views.RegenerateCodeApiView.as_view()),
     path('register/complete_profile/<uuid:id>/', views.CompleteUserProfileApiView.as_view()),
     path('register/enter_user_password/<uuid:id>/', views.EnterUserPasswordApiView.as_view()),
+    path('register/choose_skills_and_category/<uuid:user_id>/', views.SkillsAndCategoryChooseApiView.as_view()),
     path('password/forgot_password/', views.ForgotPasswordApiView.as_view()),
     path('password/reset_password/<uuid:user_id>/<str:token>/', views.ResetPasswordApiView.as_view()),
 ]

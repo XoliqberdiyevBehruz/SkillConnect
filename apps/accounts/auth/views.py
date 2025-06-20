@@ -107,3 +107,16 @@ class ResetPasswordApiView(generics.GenericAPIView):
             user.save()
             return Response({"message": "Successfully updated user password!"}, status=status.HTTP_200_OK)
         return Response({'message': 'user id or token invalid!'}, status=status.HTTP_404_NOT_FOUND)
+    
+
+class SkillsAndCategoryChooseApiView(generics.GenericAPIView):
+    serializer_class = serializers.SkillsAndCategoryChooseSerializer
+    queryset = models.User.objects.all()
+
+    def put(self, request, user_id):
+        user = get_object_or_404(models.User, id=user_id)
+        serializer = self.serializer_class(user, data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response({"message": "choosen"}, status=200)
+        return Response(serializer.errors, status=400)
