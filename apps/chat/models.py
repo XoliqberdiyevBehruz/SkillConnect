@@ -16,6 +16,7 @@ class Message(BaseModel):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="messages")
     message = models.TextField()
     is_read = models.BooleanField(default=False)
+    is_updated = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.sender} - {self.message}'
