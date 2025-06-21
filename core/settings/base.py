@@ -33,9 +33,11 @@ THIRD_PARTY_PACKAGES = [
     'rest_framework',
     'django_filters',
     'rest_framework_simplejwt',
+    'channels',
 ]
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -62,7 +64,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,7 +76,18 @@ TEMPLATES = [
     },
 ]
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
+
 WSGI_APPLICATION = 'core.wsgi.application'
+ASGI_APPLICATION = 'core.asgi.application'
 
 
 # Database
@@ -138,6 +151,7 @@ AUTH_USER_MODEL = 'accounts.User'
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 RESET_PASSWORD_LINK = env.str("RESET_PASSWORD_LINK")
 
+# from core.packages.channels import *
 from core.packages.rest_framework import *
 from core.packages.swagger import *
 from core.packages.simplejwt import *

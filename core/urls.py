@@ -31,7 +31,8 @@ urlpatterns = [
         path('user/', include('apps.portfolio.urls')),    
         path('skills/', include('apps.skills.urls')),  
       ]
-   ))
+   )),
+   path('chat/', include('apps.chat.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
