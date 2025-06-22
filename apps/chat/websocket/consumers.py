@@ -214,7 +214,7 @@ class GroupChatConsumer(AsyncJsonWebsocketConsumer):
             else:
                 await self.send_json({"error": "message_id and new_message is required"})
                 return 
-
+        
         else:
             await self.send_json({"error": "choose action(read, send)"})
             return

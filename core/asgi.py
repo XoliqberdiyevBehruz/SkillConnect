@@ -1,7 +1,7 @@
 import os
 
 from channels.routing import ProtocolTypeRouter, URLRouter
-from apps.chat.middleware import JWTAuthMiddleware
+from apps.chat.websocket.middleware import JWTAuthMiddleware
 
 from django.core.asgi import get_asgi_application
 
@@ -9,7 +9,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings.base')  # yoki ba
 
 django_asgi_app = get_asgi_application()
 
-from apps.chat.routing import websocker_urlpatterns
+from apps.chat.websocket.routing import websocker_urlpatterns
 
 application = ProtocolTypeRouter({
     "http": django_asgi_app,

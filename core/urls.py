@@ -27,12 +27,12 @@ urlpatterns = [
 
    path('api/v1/', include(
       [
-        path('auth/', include('apps.accounts.auth.urls')),
-        path('user/', include('apps.portfolio.urls')),    
-        path('skills/', include('apps.skills.urls')),  
+         path('auth/', include('apps.accounts.auth.urls')),
+         path('user/', include('apps.portfolio.urls')),    
+         path('skills/', include('apps.skills.urls')),  
+         path('chat/', include('apps.chat.http.urls')),
       ]
    )),
-   path('chat/', include('apps.chat.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
